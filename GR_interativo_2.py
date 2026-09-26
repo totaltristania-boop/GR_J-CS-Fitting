@@ -24,7 +24,6 @@ from tqdm import tqdm
 
 from PIL import Image
 
-import matplotlib
 
 from matplotlib import pyplot as plt
 
@@ -80,7 +79,6 @@ from scipy import stats
 
 
 
-import torchvision
 
 
 
@@ -157,7 +155,7 @@ index_path = 'E:/totais/txts_smps/saidas/OUTPUT/index_merged429.4.csv'
 
 # Leia o arquivo de dados e o arquivo de índice
 
-modas = pd.read_csv(file_path_modas, sep='\s+', encoding='unicode_escape', header=None)
+modas = pd.read_csv(file_path_modas, sep=r'\s+', encoding='unicode_escape', header=None)
 
 
 
@@ -171,17 +169,17 @@ df_index['datetime'] = pd.to_datetime(df_index['datetime'], format='%d/%m/%Y %H:
 
 modas.index=df_index['datetime']
 
-modas.rename(columns={0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'Concentração Moda de Nucleação', 
+modas.rename(columns={0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'Concentração Moda de Nucleação',
 
-                      8: 'Concentração Moda de Aitken', 9: 'Concentração Moda de Acumulação', 
+                      8: 'Concentração Moda de Aitken', 9: 'Concentração Moda de Acumulação',
 
-                      10: 'Diâmetro geométricos médio Nucleação', 11: 'Diâmetro geométricos médio Aitken', 
+                      10: 'Diâmetro geométricos médio Nucleação', 11: 'Diâmetro geométricos médio Aitken',
 
-                      12: 'Diâmetro geométricos médio Acumulação', 13: 'Desvio-Padrão geométrico Nucleação', 
+                      12: 'Diâmetro geométricos médio Acumulação', 13: 'Desvio-Padrão geométrico Nucleação',
 
-                      14: 'Desvio-Padrão geométrico Aitken', 15: 'Desvio-Padrão geométrico Acumulação', 
+                      14: 'Desvio-Padrão geométrico Aitken', 15: 'Desvio-Padrão geométrico Acumulação',
 
-                      16: 'Rsquared', 17: 'dfe', 18: 'adjRsquare', 19: 'RMSE', 
+                      16: 'Rsquared', 17: 'dfe', 18: 'adjRsquare', 19: 'RMSE',
 
                       21: 'Concentração total observada', 22: 'Concentração total ajustada'}, inplace=True)
 
@@ -197,7 +195,7 @@ columns_to_include = [
     'Diâmetro geométricos médio Acumulação',
     'Desvio-Padrão geométrico Acumulação'
 ]
-       
+
 
 # Subset the DataFrame with the selected columns
 
@@ -344,19 +342,19 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
     dt = str(df.index[0].date())
 
-    
+
 
     # Get the values of the banana-shape region
 
     values = df.values
 
-    
+
 
     # Get the dps
 
     dps = [float(dp) for dp in list(df.columns)]
 
-    
+
 
     # Find the indexes of the start and end times
 
@@ -364,7 +362,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
     col_max = np.where((np.array(dps) <= dp_max) == True)[0]
 
-    
+
 
     # Check if valid range is found
 
@@ -372,13 +370,13 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
         return None, None, None
 
-    
+
 
     col_min = col_min[0]
 
     col_max = col_max[-1]
 
-    
+
 
     # Obtain the time (index) when max concentration occurs for each dp
 
@@ -386,13 +384,13 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
                         for i in range(col_min, col_max+1)])
 
-    
+
 
     # Drop the NaN values
 
     tm_con_mat = pd.DataFrame(peak_con).dropna(how='any').values
 
-    
+
 
     # Split the time and dps
 
@@ -400,7 +398,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
     y_dp = tm_con_mat[:, 1]
 
-    
+
 
     # If there are less than 2 valid time-dp points, return None
 
@@ -408,7 +406,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
         return None, None, None
 
-    
+
 
     # Fit the time-dp relationship
 
@@ -432,7 +430,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
         intercept = ols.intercept_
 
-    
+
 
     # If the fitting slope less than 0, return None (negative GR)
 
@@ -440,7 +438,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
         return None, None, None
 
-    
+
 
     # Get the time and dp pairs for visualization
 
@@ -456,7 +454,7 @@ def get_GR_old(df, dp_min=9, dp_max=25, tm_res=10):
 
     y_pred = np.array([slope*item+intercept for item in x_num])
 
-    
+
 
     return slope*60, x_pred, y_pred
 
@@ -482,7 +480,7 @@ for df in dfs_por_dia_copia:
 
     df_resampled = df.resample('60T').sum()
 
-    
+
 
     # Adicionar o DataFrame resample à lista dfs_por_dia_resampled
 
@@ -490,9 +488,7 @@ for df in dfs_por_dia_copia:
 
 
 
-import numpy as np
 
-import pandas as pd
 
 
 
@@ -504,7 +500,7 @@ lambda_air = 0.066e-6  # Caminho livre médio (em metros)
 
 # Função para calcular o fator de correção C usando dp
 
-def calcular_C(dp):
+def calcular_C_nm(dp):
 
     return 1 + (((lambda_air) / dp) * (2.514 + (0.8 * np.exp((-0.55 * lambda_air) / dp))))
 
@@ -512,11 +508,11 @@ def calcular_C(dp):
 
 # Função para calcular k(dp)
 
-def calcular_k_dp(dp):
+def calcular_k_dp_nm(dp):
 
     dp_m = dp * 1e-9    # Converter dp de nm para metros
 
-    C = calcular_C(dp_m)
+    C = calcular_C_nm(dp_m)
 
     return 3e-16 * C
 
@@ -528,49 +524,49 @@ def calcular_gr_coag_por_faixa(df):
 
     gr_coag_values = []
 
-    
+
 
     for index, row in df.iterrows():
 
         gr_coag_row = 0.0
 
-        
+
 
         for col in df.columns:
 
             dp = float(col)
 
-            
+
 
             if dp < 9 or dp > 600:
 
                 continue  # Pular colunas fora do intervalo desejado
 
-            
 
-            k_dp = calcular_k_dp(dp)
+
+            k_dp = calcular_k_dp_nm(dp)
 
             N = row[col]  # Concentração da faixa de tamanho dp
 
-            
+
 
             if pd.isna(N):
 
                 continue
 
-            
+
 
             # Calcular GR_coag em nm/h
 
-            gr_coag_value = (dp / 6) * k_dp * N   
+            gr_coag_value = (dp / 6) * k_dp * N
 
             gr_coag_row += gr_coag_value
 
-        
+
 
         gr_coag_values.append(gr_coag_row*1e9)
 
-    
+
 
     return gr_coag_values
 
@@ -596,19 +592,19 @@ for df in dfs_por_dia:
 
     df_copy = df.copy()
 
-    
+
 
     # Calcular GR_coag para cada linha do DataFrame original
 
     gr_coag_values = calcular_gr_coag_por_faixa(df)
 
-    
+
 
     # Adicionar a coluna GR_coag ao DataFrame copiado
 
     df_copy['GR_coag'] = gr_coag_values
 
-    
+
 
     # Adicionar o DataFrame modificado à lista df_gr
 
@@ -622,7 +618,7 @@ for df in df_gr:
 
     print(df)
 
-    
+
 
 dfs_por_dia_resampled = []
 
@@ -634,7 +630,7 @@ for df in df_gr:
 
     df_resampled = df.resample('60T').mean()
 
-    
+
 
     # Adicionar o DataFrame resample à lista dfs_por_dia_resampled
 
@@ -680,19 +676,17 @@ dfs_por_dia_modas = [df for df in dfs_por_dia_modas if pd.Series(df.index.date).
 
 # Função para calcular o fator de correção C
 
-def calcular_C(d):
-
+def calcular_C_m(d):
     C = 1 + (lambda_air / d) * (2.514 + 0.8 * np.exp(-0.55 * d / lambda_air))
-
     return C
 
 
 
 # Função para calcular k(dp)
 
-def calcular_k_dp(d):
+def calcular_k_dp_m(d):
 
-    C = calcular_C(d)
+    C = calcular_C_m(d)
 
     return 3e-16 * C
 
@@ -811,7 +805,7 @@ def calcular_gr_coag(df_gmd_10_25):
         gmd_value = row['GMD_10_25']
         N_cm3 = row['N_10_25']
 
-        
+
 
         if pd.isna(gmd_value) or pd.isna(N_cm3):
 
@@ -821,19 +815,19 @@ def calcular_gr_coag(df_gmd_10_25):
 
             continue
 
-        
+
 
         # Converter N de partículas/cm³ para partículas/m³
 
         N_m3 = N_cm3 * 1e6
 
-        
+
 
         gmd_value_meters = gmd_value * 1e-9  # Converter nm para metros
 
-        k_dp = calcular_k_dp(gmd_value_meters)
+        k_dp = calcular_k_dp_m(gmd_value_meters)
 
-        
+
 
         # Calcular o intervalo de tempo (Δt) em horas
 
@@ -845,21 +839,21 @@ def calcular_gr_coag(df_gmd_10_25):
 
             delta_t = 0
 
-        
+
 
         # Ajustar GR_coag considerando Δt
 
-        gr_coag_value = (gmd_value / 6) * k_dp * N_m3 * delta_t 
+        gr_coag_value = (gmd_value / 6) * k_dp * N_m3 * delta_t
 
         gr_coag_value = gr_coag_value * 1e9 / 3600
 
         gr_coag.append(gr_coag_value)
 
-        
+
 
         previous_time = index
 
-    
+
 
     gr_coag_df = pd.DataFrame({'GR_coag': gr_coag}, index=df_gmd_10_25.index)
 
@@ -919,19 +913,14 @@ lambda_air = 0.066e-6   # Caminho livre médio do ar, m
 
 # Função para calcular o fator de correção de Cunningham
 
-def calcular_C(d):
-
-    C = 1 + (lambda_air / d) * (2.514 + 0.8 * np.exp(-0.55 * d / lambda_air))
-
-    return C
 
 
 
 # Função para calcular o coeficiente de difusão
 
-def diffusion_coefficient(d_p):
+def diffusion_coefficient_m(d_p):
 
-    C = calcular_C(d_p)
+    C = calcular_C_m(d_p)
 
     return (k * T * C) / (3 * np.pi * eta * d_p)
 
@@ -939,11 +928,11 @@ def diffusion_coefficient(d_p):
 
 # Função para calcular k(d_p,j)
 
-def coagulation_kernel(d_p_i, d_p_j):
+def coagulation_kernel_m(d_p_i, d_p_j):
 
-    D_i = diffusion_coefficient(d_p_i)
+    D_i = diffusion_coefficient_m(d_p_i)
 
-    D_j = diffusion_coefficient(d_p_j)
+    D_j = diffusion_coefficient_m(d_p_j)
 
     beta = 1.0  # Aproximação para o fator de correção
 
@@ -953,7 +942,7 @@ def coagulation_kernel(d_p_i, d_p_j):
 
 # Função para calcular CoagS_i para um DataFrame
 
-def calculate_coags(df):
+def calculate_coags_1(df):
 
     particle_diameter = pd.to_numeric(df.columns, errors='coerce')   # Converter para metros
 
@@ -981,7 +970,7 @@ def calculate_coags(df):
 
 
 
-            k_dpij = coagulation_kernel(d_p_i, d_p_j)
+            k_dpij = coagulation_kernel_m(d_p_i, d_p_j)
 
             sum_coag += k_dpij * N_j
 
@@ -1027,11 +1016,11 @@ def calculate_gr_scav(df, coagS):
 
     # Conversão de unidades: m/h para nm/h
 
-    gr_scav_nmh = gr_scav 
+    gr_scav_nmh = gr_scav
 
 
 
-    return gr_scav_nmh 
+    return gr_scav_nmh
 
 
 
@@ -1039,7 +1028,7 @@ def calculate_gr_scav(df, coagS):
 
 # Calcular CoagS para cada DataFrame
 
-coagS_por_dia = [calculate_coags(df) for df in dfs_por_dia]
+coagS_por_dia = [calculate_coags_1(df) for df in dfs_por_dia]
 
 
 
@@ -1055,7 +1044,6 @@ for i, gr_scav in enumerate(gr_scav_por_dia):
 
     print(f"Dia {i+1}: GR_scav (nm/h) = {gr_scav:.8f}")
 
-    
 
 
 
@@ -1079,7 +1067,10 @@ for i, gr_scav in enumerate(gr_scav_por_dia):
 
 
 
-##################################################################################
+
+
+# ==============================================================================
+
 
 
 
@@ -1104,9 +1095,7 @@ from matplotlib.widgets import Button, SpanSelector
 
 from sklearn.linear_model import LinearRegression
 
-import pandas as pd
 
-import numpy as np
 
 import matplotlib.colors as colors
 
@@ -1187,19 +1176,19 @@ def calcular_max_conc(df):
 
     max_indices = np.argmax(df.values, axis=1)
 
-    
+
 
     # Usa esses índices para obter o diâmetro correspondente ao valor máximo
 
     max_concentration_diameters = df.columns[max_indices].astype(float)
 
-    
+
 
     # Cria o DataFrame com o valor do diâmetro máximo para cada timestamp
 
     max_concentration_df = pd.DataFrame({'GMD': max_concentration_diameters}, index=df.index)
 
-    
+
 
     return max_concentration_df
 
@@ -1420,15 +1409,15 @@ def calcular_gr_dpg(serie_dpg, start_dt, end_dt, dp_min, dp_max, truncar_teto=Tr
 
     # Recorte inicial da janela desenhada pelo usuário
     serie = serie.loc[(serie.index >= start_dt) & (serie.index <= end_dt)]
-    
+
     if truncar_teto:
         pontos_validos = []
         rastreando = False
-        
+
         for t, val in serie.items():
             if pd.isna(val):
                 continue
-            
+
             # Se a partícula está dentro da moda, começamos a guardar os pontos
             if dp_min <= val <= dp_max:
                 rastreando = True
@@ -1436,7 +1425,7 @@ def calcular_gr_dpg(serie_dpg, start_dt, end_dt, dp_min, dp_max, truncar_teto=Tr
             # Se furou o teto (ex: passou de 25nm) e já estávamos a rastrear, PARA TUDO!
             elif val > dp_max and rastreando:
                 break
-                
+
         serie = serie.loc[pontos_validos]
     else:
         # Para o Global, apenas ignora o corte no teto
@@ -1554,9 +1543,9 @@ def toggle_image_visibility(event):
 
 
 
-        
 
-      
+
+
 def calcular_dp_peak_global(df):
 
     valores = df.to_numpy(dtype=float)
@@ -1591,7 +1580,7 @@ def calcular_dp_peak_global(df):
         resultado,
         index=df.index,
         name='Dp_peak'
-    )  
+    )
 
 
 
@@ -1604,18 +1593,18 @@ def save_evento_completo(event):
     global selected_data_list
     if not selected_data_list:
         return
-        
+
     evento = selected_data_list[-1]
     start_dt, end_dt, gr_info, classe = evento[:4]
-    
+
     if classe is None:
         print("ERRO: Escolha uma classe (I, Ib, II ou Indeterminado) primeiro!")
         return
-        
+
     if not isinstance(gr_info, dict):
         print("Evento já salvo.")
         return
-        
+
     # Lógica inteligente: Guarda só o que interessa para cada classe
     if classe in ['Classe I', 'Classe Ib', 'Classe II']:
         dados_salvos = {
@@ -1633,7 +1622,7 @@ def save_evento_completo(event):
         }
     else:
         dados_salvos = gr_info
-        
+
     selected_data_list[-1] = (start_dt, end_dt, str(dados_salvos), classe)
     save_selected_data()
     print(f"-> SUCESSO! Evento {classe} salvo de forma otimizada!")
@@ -1654,34 +1643,34 @@ delta_t_box = None
 
 
 
-user_name ='rubens.pereira@usp.br' 
-my_password='sakuracc' 
-stations_codes = [] 
-poluttant_codes = [] 
-station_list=pd.DataFrame(qr.cetesb_aqs()) 
-param_list=pd.DataFrame(qr.cetesb_param()) 
+user_name = os.getenv('CETESB_USER', 'user@example.com')
+my_password = os.getenv('CETESB_PASSWORD', 'default_password')
+stations_codes = []
+poluttant_codes = []
+station_list=pd.DataFrame(qr.cetesb_aqs())
+param_list=pd.DataFrame(qr.cetesb_param())
 # ========================================================
 # FUNÇÃO ORIGINAL RESTAURADA
 # ========================================================
 def coleta_e_printa(path):
     infos = pd.read_csv(path, sep=';', encoding='unicode-escape',
-                        quotechar='"', decimal=".") 
+                        quotechar='"', decimal=".")
     stations_codes=infos["Estações Codes"]
     poluttant_codes=infos["Param Codes"]
     start_date=infos["Ini_Date"][0]
     end_date=infos["Final_Date"][0]
     stations_codes=stations_codes.dropna()
     poluttant_codes=poluttant_codes.dropna()
-    
-                    
+
+
     tamanho_dataframe=int(len(stations_codes)*len(poluttant_codes))
     all_data = [[] for i in range(tamanho_dataframe)]
     tamanho_dataframe=0
     for i in range (len(stations_codes)):
         for k in tqdm(range (len(poluttant_codes))):
-       
-    
-            o3_code = poluttant_codes[k] 
+
+
+            o3_code = poluttant_codes[k]
             pin_code = int(stations_codes[i])
             station_index=int((station_list[station_list['code']==stations_codes[i]].index.values.astype(int)[0]))
             param_index=int((param_list[param_list['code']==poluttant_codes[k]].index.values.astype(int)[0]))
@@ -1692,8 +1681,8 @@ def coleta_e_printa(path):
             print("Para o composto/parametro ",param_list['name'][param_index])
             nome_param=str(param_list['name'][param_index])
             nome_esta=str(station_list['name'][station_index])
-            
-          
+
+
             dados_estacao = qr.cetesb_retrieve(
               user_name,
               my_password,
@@ -1702,7 +1691,7 @@ def coleta_e_printa(path):
               o3_code,
               pin_code
               )
-            
+
             df= dados_estacao
             if(df.isnull().values.all()!= True):
                 df = df.drop(["name","pol_name","units"] ,axis=1)
@@ -1716,7 +1705,7 @@ def coleta_e_printa(path):
                 df['estação']=str(station_list['name'][station_index])
                 all_data[tamanho_dataframe].append(df)
                 tamanho_dataframe = (tamanho_dataframe+1)
-            
+
     return all_data
 
 if 'dados_polu' not in locals() or 'dados_polu' not in globals():
@@ -2203,8 +2192,8 @@ def plot_wind_panel(
         axis='x',
         alpha=0.15
     )
-    
-    
+
+
 # ==========================================================
 # TRIAGEM VISUAL - GERAR GRÁFICOS DE TODOS OS DIAS
 # ==========================================================
@@ -2233,11 +2222,11 @@ def onselect(xmin, xmax):
     # Blindagem contra o bug de duplo disparo do Matplotlib
     if xmin == xmax:
         return
-        
+
     global text_boxes, delta_t_box
     global x_num, i
     global df, fig, ax
-    global dp_peak_global_dia  
+    global dp_peak_global_dia
 
     start_dt = (
         mdates.num2date(xmin)
@@ -2255,7 +2244,7 @@ def onselect(xmin, xmax):
     for line in list(ax[0].lines):
         if str(line.get_label()).startswith('_GR_MC'):
             line.remove()
-            
+
     for collection in list(ax[0].collections):
         if str(collection.get_label()).startswith('_PONTOS_MC'):
             collection.remove()
@@ -2273,30 +2262,30 @@ def onselect(xmin, xmax):
     # GR PELO Dpg (COM ALGORITMO INTELIGENTE DE CORTE)
     # Aqui a onselect "chama" o truncar_teto!
     # =====================================================
-    
+
     resultado_nuc = calcular_gr_dpg(dpg_nuc, start_dt, end_dt, 10.6, 25.0, truncar_teto=True)
     resultado_aitken = calcular_gr_dpg(dpg_aitken, start_dt, end_dt, 25.0, 100.0, truncar_teto=True)
     resultado_acc = calcular_gr_dpg(dpg_acc, start_dt, end_dt, 100.0, 429.4, truncar_teto=True)
-    
+
     # O Global não trunca, rastreia a banana inteira!
     resultado_global = calcular_gr_dpg(dp_peak_global_dia, start_dt, end_dt, 10.6, 600.0, truncar_teto=False)
 
     # =====================================================
     # DESENHAR OS AJUSTES MC (INCLUINDO O GLOBAL)
     # =====================================================
-    
+
     # 1) NUCLEAÇÃO (Cyan)
     if resultado_nuc is not None:
         pontos_nuc = resultado_nuc['pontos']
         ax[0].scatter(pontos_nuc.index, pontos_nuc.values, color='cyan', marker='x', s=55, linewidths=2, zorder=32, label='_PONTOS_MC_NUC')
         ax[0].plot(resultado_nuc['t_linha'], resultado_nuc['dp_linha'], '--', color='cyan', linewidth=2.5, zorder=31, label='_GR_MC_NUC')
-    
+
     # 2) AITKEN (Limegreen)
     if resultado_aitken is not None:
         pontos_aitken = resultado_aitken['pontos']
         ax[0].scatter(pontos_aitken.index, pontos_aitken.values, color='limegreen', marker='x', s=55, linewidths=2, zorder=32, label='_PONTOS_MC_AITKEN')
         ax[0].plot(resultado_aitken['t_linha'], resultado_aitken['dp_linha'], '--', color='limegreen', linewidth=2.5, zorder=31, label='_GR_MC_AITKEN')
-    
+
     # 3) ACUMULAÇÃO (Black)
     if resultado_acc is not None:
         pontos_acc = resultado_acc['pontos']
@@ -2313,7 +2302,7 @@ def onselect(xmin, xmax):
     # INFORMAÇÕES DOS 4 AJUSTES Dpg NA TELA
     # =====================================================
     linhas_gr = []
-    
+
     if resultado_nuc is not None:
         linhas_gr.append(f'Nuc (10-25): {resultado_nuc["GR"]:.2f} nm/h  |  R² = {resultado_nuc["R2"]:.2f}')
     if resultado_aitken is not None:
@@ -2322,9 +2311,9 @@ def onselect(xmin, xmax):
         linhas_gr.append(f'Acc (100-429): {resultado_acc["GR"]:.2f} nm/h  |  R² = {resultado_acc["R2"]:.2f}')
     if resultado_global is not None:
         linhas_gr.append(f'GLOBAL (Pico): {resultado_global["GR"]:.2f} nm/h  |  R² = {resultado_global["R2"]:.2f}')
-    
+
     texto_gr = '\n'.join(linhas_gr)
-    
+
     text_boxes.append(
         fig.text(
             0.58, 0.975, texto_gr,
@@ -2345,23 +2334,23 @@ def onselect(xmin, xmax):
     # =====================================================
     gr_info = {
         'GR_Global': round(resultado_global['GR'], 2) if resultado_global else np.nan,
-        
+
         'GR_10_25': round(resultado_nuc['GR'], 2) if resultado_nuc else np.nan,
         'Start_Nuc': resultado_nuc['pontos'].index.min().strftime('%H:%M:%S') if resultado_nuc else None,
         'End_Nuc': resultado_nuc['pontos'].index.max().strftime('%H:%M:%S') if resultado_nuc else None,
-        
+
         'GR_25_100': round(resultado_aitken['GR'], 2) if resultado_aitken else np.nan,
         'Start_Aitken': resultado_aitken['pontos'].index.min().strftime('%H:%M:%S') if resultado_aitken else None,
         'End_Aitken': resultado_aitken['pontos'].index.max().strftime('%H:%M:%S') if resultado_aitken else None
     }
-    
+
     novo_dado = (start_dt, end_dt, gr_info, None)
-    
+
     if selected_data_list and selected_data_list[-1][3] is None:
         selected_data_list[-1] = novo_dado
     else:
         selected_data_list.append(novo_dado)
-        
+
     fig.canvas.draw_idle()
 
 
@@ -2373,39 +2362,39 @@ while i < len(dfs_por_dia) and not stop_flag:
 
     df = dfs_por_dia[i]
     df2 = dfs_por_dia[i]
-    
+
     # Calcula o Pico Global para o dia inteiro (Disponibiliza para o onselect)
     global dp_peak_global_dia
     dp_peak_global_dia = calcular_dp_peak_global(df)
-    
+
     # =====================================================
     # DIA E TRAÇADORES DE DIÂMETRO
     # =====================================================
     data_obj = df.index[0].date()
     data = df.index[0].strftime('%Y-%m-%d')
-    
+
     # =====================================================
     # Dpg DAS MODAS MATLAB DO DIA ATUAL
     # =====================================================
     moda_dia = modas_por_data.get(data_obj, pd.DataFrame()).copy()
-    
+
     if not moda_dia.empty:
         moda_dia.index = pd.to_datetime(moda_dia.index)
         if moda_dia.index.tz is not None:
             moda_dia.index = moda_dia.index.tz_localize(None)
-    
+
         # Nucleação
         dpg_nuc = pd.to_numeric(moda_dia['Diâmetro geométricos médio Nucleação'], errors='coerce')
         valido_nuc = dpg_nuc.notna() & (dpg_nuc >= 10.6) & (dpg_nuc < 25)
-    
+
         # Aitken
         dpg_aitken = pd.to_numeric(moda_dia['Diâmetro geométricos médio Aitken'], errors='coerce')
         valido_aitken = dpg_aitken.notna() & (dpg_aitken >= 25) & (dpg_aitken < 100)
-    
+
         # Acumulação
         dpg_acc = pd.to_numeric(moda_dia['Diâmetro geométricos médio Acumulação'], errors='coerce')
         valido_acc = dpg_acc.notna() & (dpg_acc >= 100) & (dpg_acc <= 429.4)
-        
+
     dia_inicio = df.index[0].normalize()
     dia_fim = dia_inicio + pd.Timedelta(days=1)
 
@@ -2424,7 +2413,7 @@ while i < len(dfs_por_dia) and not stop_flag:
     # PAINEL PRINCIPAL INTERATIVO (PUBLICATION QUALITY)
     # =====================================================
     fig, ax = plt.subplots(
-        5, 1, 
+        5, 1,
         figsize=(18, 14), # Tamanho ajustado para caber perfeito no monitor
         sharex=True,
         gridspec_kw={'height_ratios': [4, 1.2, 1, 1, 0.8]}
@@ -2439,22 +2428,22 @@ while i < len(dfs_por_dia) and not stop_flag:
     X, Y = np.meshgrid(x_num, y_vals)
     Z = df_conc_filtrado.values
     masked_Z = np.ma.masked_where(Z <= 1, Z)
-    
+
     p = ax[0].pcolormesh(X, Y, masked_Z, norm=colors.LogNorm(vmin=1e1, vmax=5e4), cmap='nipy_spectral', shading='auto')
     ax[0].set_yscale('log')
-    
+
     y_ticks = [10.6, 20, 50, 100, 200, 300, 400, 500, 600]
     ax[0].set_yticks(y_ticks)
     ax[0].set_yticklabels(['10.6', '20', '50', '100', '200', '300', '400', '500', '600'])
     ax[0].set_ylim(10.6, 600)
-    
+
     # Linhas divisórias (25 nm e 100 nm)
     ax[0].axhline(y=25, color='white', linestyle='-', linewidth=2, alpha=0.9, zorder=10)
     ax[0].axhline(y=100, color='white', linestyle='--', linewidth=1.5, alpha=0.75, zorder=10)
-    
+
     ax[0].set_ylabel('Particle Diameter, Dp (nm)', fontweight='bold')
     ax[0].set_title(f'PNSD Dynamics - {data}', fontweight='bold', fontsize=16)
-    
+
     # ==========================================================
     # Dpg DAS MODAS MATLAB SOBRE O CONTORNO
     # ==========================================================
@@ -2494,12 +2483,12 @@ while i < len(dfs_por_dia) and not stop_flag:
     # ==========================================================
     plot_wind_panel(ax[4], vento_dia, norm=wind_norm, cmap=wind_cmap, calm_threshold=0.3, passo=2, marker_size=260)
     ax[4].set_xlabel('Local Time (h)', fontweight='bold')
-    
+
     sm_wind = ScalarMappable(norm=wind_norm, cmap=wind_cmap)
     sm_wind.set_array([])
     cbar_wind = fig.colorbar(sm_wind, ax=ax[4], orientation='vertical', pad=0.01, fraction=0.015)
     cbar_wind.set_label('Wind speed (m s$^{-1}$)', fontsize=11)
-    
+
     for a in ax:
         a.set_xlim(dia_inicio, dia_fim)
         # Fechar caixas
@@ -2570,7 +2559,7 @@ while i < len(dfs_por_dia) and not stop_flag:
 
     fig.subplots_adjust(left=0.17, right=0.91, top=0.94, bottom=0.06, hspace=0.10)
     plt.show(block=True)
-    
+
     i += 1  # Move to the next dataframe only if not stopped
 
 save_selected_data()
@@ -2626,22 +2615,22 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
     # ======================================================
     # Dpg DAS MODAS AJUSTADAS NO MATLAB
     # ======================================================
-    
+
     moda_dia = modas_por_data.get(
         data_obj,
         pd.DataFrame()
     ).copy()
-    
+
     if not moda_dia.empty:
-    
+
         # garantir índice datetime sem timezone
         moda_dia.index = pd.to_datetime(
             moda_dia.index
         )
-    
+
         if moda_dia.index.tz is not None:
             moda_dia.index = moda_dia.index.tz_localize(None)
-    
+
         # --------------------------------------------------
         # Nucleação
         # --------------------------------------------------
@@ -2649,13 +2638,13 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
             moda_dia['Diâmetro geométricos médio Nucleação'],
             errors='coerce'
         )
-    
+
         valido_nuc = (
             dpg_nuc.notna() &
             (dpg_nuc >= 10.6) &
             (dpg_nuc < 25)
         )
-    
+
         # --------------------------------------------------
         # Aitken
         # --------------------------------------------------
@@ -2663,13 +2652,13 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
             moda_dia['Diâmetro geométricos médio Aitken'],
             errors='coerce'
         )
-    
+
         valido_aitken = (
             dpg_aitken.notna() &
             (dpg_aitken >= 25) &
             (dpg_aitken < 100)
         )
-    
+
         # --------------------------------------------------
         # Acumulação
         # --------------------------------------------------
@@ -2677,31 +2666,31 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
             moda_dia['Diâmetro geométricos médio Acumulação'],
             errors='coerce'
         )
-    
+
         valido_acc = (
             dpg_acc.notna() &
             (dpg_acc >= 100) &
             (dpg_acc <= 429.4)
         )
-        
-    
-    
+
+
+
         # ======================================================
         # CONCENTRAÇÕES
         # ======================================================
-    
+
         N_total = integrar_pnc(
             df,
             10.6,
             429.4
         )
-    
+
         N_10_25 = integrar_pnc(
             df,
             10.6,
             25
         )
-    
+
         df_pnc = pd.DataFrame({
             "N_total": N_total,
             "N_10_25": N_10_25
@@ -2727,7 +2716,7 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
     # ======================================================
     # VENTO
     # ======================================================
-    
+
     vento_dia = wind_hour.loc[
         (wind_hour.index >= dia_inicio) &
         (wind_hour.index < dia_fim)
@@ -2798,9 +2787,9 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
     10.6, 20, 50, 100,
     200, 300, 400, 500, 600
     ]
-    
+
     ax[0].set_yticks(y_ticks)
-    
+
     ax[0].set_yticklabels([
         '10.6', '20', '50', '100',
         '200', '300', '400', '500', '600'
@@ -2833,9 +2822,9 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
         # ======================================================
     # Dpg DAS MODAS MATLAB SOBRE O CONTORNO
     # ======================================================
-    
+
     if not moda_dia.empty:
-    
+
         # Nucleação
         ax[0].scatter(
             moda_dia.index[valido_nuc],
@@ -2846,7 +2835,7 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
             zorder=20,
             label='Dpg — nucleação'
         )
-    
+
         # Aitken
         ax[0].scatter(
             moda_dia.index[valido_aitken],
@@ -2857,7 +2846,7 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
             zorder=20,
             label='Dpg — Aitken'
         )
-    
+
         # Acumulação
         ax[0].scatter(
             moda_dia.index[valido_acc],
@@ -2977,14 +2966,14 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
     ax[4].xaxis.set_major_locator(
         mdates.HourLocator(interval=2)
     )
-    
+
     ax[4].xaxis.set_major_formatter(
         mdates.DateFormatter("%H:%M")
     )
     # ======================================================
     # 5 - VENTO
     # ======================================================
-    
+
     plot_wind_panel(
         ax[4],
         vento_dia,
@@ -2994,18 +2983,18 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
         passo=2,
         marker_size=230
     )
-    
+
     ax[4].set_xlabel(
         'Hora local'
     )
-    
+
     sm_wind = ScalarMappable(
     norm=wind_norm,
     cmap=wind_cmap
     )
-    
+
     sm_wind.set_array([])
-    
+
     cbar_wind = fig.colorbar(
         sm_wind,
         ax=ax[4],
@@ -3013,12 +3002,12 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
         pad=0.01,
         fraction=0.018
     )
-    
+
     cbar_wind.set_label(
         'Vento (m s$^{-1}$)',
         fontsize=10
     )
-    
+
     cbar_wind.ax.tick_params(
         labelsize=9
     )
@@ -3030,12 +3019,12 @@ for numero, df in enumerate(dfs_por_dia_todos, start=1):
     cax_pnsd = ax[0].inset_axes(
         [1.01, 0.0, 0.012, 1.0]
     )
-    
+
     cbar = fig.colorbar(
         p,
         cax=cax_pnsd
     )
-    
+
     cbar.set_label(
         'dN/dlog$D_p$ (cm$^{-3}$)'
     )
@@ -3085,15 +3074,15 @@ imagens_png = sorted(glob.glob(os.path.join(pasta_triagem, "*.png")))
 
 if imagens_png:
     lista_imagens = []
-    
+
     # Abre cada imagem e converte para o formato RGB (necessário para o PDF)
     for caminho_img in imagens_png:
         img = Image.open(caminho_img).convert('RGB')
         lista_imagens.append(img)
-    
+
     # O arquivo PDF será salvo na mesma pasta
     caminho_pdf = os.path.join(pasta_triagem, "Relatorio_Triagem_NPF.pdf")
-    
+
     # Salva a primeira imagem e anexa o restante das imagens como novas páginas
     primeira_imagem = lista_imagens[0]
     primeira_imagem.save(
@@ -3101,7 +3090,7 @@ if imagens_png:
         save_all=True,
         append_images=lista_imagens[1:]
     )
-    
+
     print(f"Relatório PDF criado com sucesso em: {caminho_pdf}")
 else:
     print("Nenhuma imagem encontrada para gerar o PDF.")
@@ -3112,12 +3101,18 @@ i = 0
 
 
 
-##################################################################################
+
+
+# ==============================================================================
+# ALTERNATIVE MATHEMATICAL MODELS
+# ==============================================================================
+
+
+# --- ALTERNATIVE VARIATION 1 (Fuchs-Sutugin) ---
 
 
 
-import pandas as pd
-import numpy as np
+
 import re
 
 # ==========================================================
@@ -3159,26 +3154,26 @@ for i in range(len(df_g)):
         row = df_g.iloc[i]
         start = row['start_datetime']
         end = row['end_datetime']
-        
+
         # Obtendo o DataFrame correspondente
         df = dfs_por_dia[i]
-        
+
         # Encontrando os índices mais próximos
         nearest_start_idx = df.index.get_indexer([start], method='nearest')[0]
         nearest_end_idx = df.index.get_indexer([end], method='nearest')[0]
-        
+
         nearest_start = df.index[nearest_start_idx]
         nearest_end = df.index[nearest_end_idx]
-        
+
         # Filtrando o DataFrame pelo índice datetime
         filtered_df = df.loc[nearest_start:nearest_end]
         filtered_dfs.append(filtered_df)
 
 
-    
-    
+
+
 # Calcular CoagS para cada DataFrame
-coagS_por_dia = [calculate_coags(df) for df in filtered_dfs]
+coagS_por_dia = [calculate_coags_1(df) for df in filtered_dfs]
 
 # Calculate GR_scav for each DataFrame
 gr_scav_por_dia = [calculate_gr_scav(df, coagS.sum(axis=1)) for df, coagS in zip(filtered_dfs, coagS_por_dia)]
@@ -3187,23 +3182,14 @@ gr_scav_por_dia = [calculate_gr_scav(df, coagS.sum(axis=1)) for df, coagS in zip
 for i, gr_scav in enumerate(gr_scav_por_dia):
     print(f"Dia {i+1}: GR_scav (nm/h) = {gr_scav:.8f}")
 
-# Iterar sobre cada DataFrame e calcular GR_coag
-gr_coag_list = []
 
-for df in dfs_por_dia:
-    df_gmd_10_25 = calcular_gmd_intervalo(df)
-    gr_coag_df = calcular_gr_coag(df_gmd_10_25)
-    gr_coag_list.append(gr_coag_df)
 
-# Calcular a média de GR_coag para cada DataFrame e imprimir
-for i, gr_coag_df in enumerate(gr_coag_list):
-    gr_coag_mean = gr_coag_df['GR_coag'].mean()
-    print(f"Dia {i+1}: Média de GR_coag = {gr_coag_mean:.8f} nm/h")
-    
-##################################################################################
 
-    
-    
+# --- ALTERNATIVE VARIATION 2 (Cunningham Matrix / General) ---
+
+
+
+
 
 
 
@@ -3213,22 +3199,22 @@ T = 298  # Temperatura (K)
 eta = 1.81e-5  # Viscosidade do ar (Pa.s)
 lambda_air = 68e-9  # Caminho livre médio do ar (m)
 
-def calcular_C(d_p):
+def calcular_C_p3_1(d_p):
     Kn = lambda_air / d_p
     return (1 + Kn) / (1 + 1.71 * Kn + 1.33 * Kn**2)
 
-def diffusion_coefficient(d_p):
-    C = calcular_C(d_p)
+def diffusion_coefficient_p3_1(d_p):
+    C = calcular_C_p3_1(d_p)
     return (k * T * C) / (3 * np.pi * eta * d_p)
 
-def coagulation_kernel(d_p_i, d_p_j):
-    D_i = diffusion_coefficient(d_p_i)
-    D_j = diffusion_coefficient(d_p_j)
+def coagulation_kernel_p3_1(d_p_i, d_p_j):
+    D_i = diffusion_coefficient_p3_1(d_p_i)
+    D_j = diffusion_coefficient_p3_1(d_p_j)
     Kn = (lambda_air / d_p_i + lambda_air / d_p_j) / 2
     beta = (1 + Kn) / (1 + 1.71 * Kn + 1.33 * Kn**2)  # Fator de correção de Fuchs-Sutugin
     return (D_i + D_j) * np.pi * beta
 
-def calculate_coags(df):
+def calculate_coags_p3_1(df):
     particle_diameter = pd.to_numeric(df.columns, errors='coerce')  # Converter para metros
     number_concentration = df.values
 
@@ -3242,15 +3228,15 @@ def calculate_coags(df):
             d_p_j = particle_diameter[j]
             N_j = number_concentration[:, j]
 
-            k_dpij = coagulation_kernel(d_p_i, d_p_j)
+            k_dpij = coagulation_kernel_p3_1(d_p_i, d_p_j)
             sum_coag += k_dpij * N_j
 
         coagS.append(sum_coag * N_i.mean())  # Média da concentração numérica
 
     return np.array(coagS)
-    
+
 # Calcular CoagS para cada DataFrame
-coagS_por_dia = [calculate_coags(df) for df in filtered_dfs]
+coagS_por_dia = [calculate_coags_p3_1(df) for df in filtered_dfs]
 
 # Calculate GR_scav for each DataFrame
 gr_scav_por_dia = [calculate_gr_scav(df, coagS.sum(axis=1)) for df, coagS in zip(filtered_dfs, coagS_por_dia)]
@@ -3259,78 +3245,65 @@ gr_scav_por_dia = [calculate_gr_scav(df, coagS.sum(axis=1)) for df, coagS in zip
 for i, gr_scav in enumerate(gr_scav_por_dia):
     print(f"Dia {i+1}: GR_scav (nm/h) = {gr_scav:.8f}")
 
-# Iterar sobre cada DataFrame e calcular GR_coag
-gr_coag_list = []
 
-for df in dfs_por_dia:
-    df_gmd_10_25 = calcular_gmd_intervalo(df)
-    gr_coag_df = calcular_gr_coag(df_gmd_10_25)
-    gr_coag_list.append(gr_coag_df)
 
-# Calcular a média de GR_coag para cada DataFrame e imprimir
-for i, gr_coag_df in enumerate(gr_coag_list):
-    gr_coag_mean = gr_coag_df['GR_coag'].mean()
-    print(f"Dia {i+1}: Média de GR_coag = {gr_coag_mean:.8f} nm/h")
-    
-    
+
 
 
 # Constantes (substitua com seus valores)
 lambda_air = 68e-9   # Caminho livre médio do vapor [m]
 
 # Função para calcular o fator de correção C
-def calcular_C(d):
+def calcular_C_p3_1(d):
     C = 1 + (lambda_air / d) * (2.514 + 0.8 * np.exp(-0.55 * d / lambda_air))
     return C
 
 # Função para calcular k(dp)
-def calcular_k_dp(d):
-    C = calcular_C(d)
+def calcular_k_dp_p3_1(d):
+    C = calcular_C_p3_1(d)
     return 3e-16 * C
 
 # Função para calcular a concentração (N) de cada partícula para o intervalo de 9 a 25 nm
-def calcular_concentracao(df, lower_bound=9, upper_bound=600):
+def calcular_concentracao_p3_1(df, lower_bound=9, upper_bound=600):
     # Converter os diâmetros das colunas para valores numéricos
     logDp_values = pd.to_numeric(df.columns, errors='coerce')
-    
+
     # Filtrar os diâmetros entre 9 e 25 nm
     mask = (logDp_values >= lower_bound) & (logDp_values <= upper_bound)
     filtered_logDp_values = logDp_values[mask].values  # Converter para numpy array
-    
+
     # Lista para armazenar as concentrações de cada linha
     concentracao = []
-    
+
     # Iterar sobre as linhas do DataFrame (cada linha é um ponto no tempo)
     for index, row in df.iterrows():
         # Filtrar as concentrações para o intervalo de diâmetro
         mean_concentration = row[mask]
-        
+
         if mean_concentration.isnull().any():
             concentracao.append([np.nan] * len(filtered_logDp_values))
             continue
-        
+
         # Calcular dlog(dp) (diferença logarítmica)
         dlogDp = np.diff(np.log10(filtered_logDp_values))  # Diferença logarítmica entre diâmetros
-        
+
         # Calcular a concentração (N) para cada partícula
         N = mean_concentration.values[:-1] * dlogDp  # Concentração para cada diâmetro
         concentracao.append(N)
-    
+
     # Criar o DataFrame de concentrações (com datetime no índice e diâmetros nas colunas)
     conc_df = pd.DataFrame(concentracao, columns=filtered_logDp_values[:-1], index=df.index)
     return conc_df
 
 # Supondo que filtered_dfs seja a lista de DataFrames
-filtered_dfs_conc = [calcular_concentracao(df) for df in filtered_dfs]
+filtered_dfs_conc = [calcular_concentracao_p3_1(df) for df in filtered_dfs]
 
 # Exemplo de como acessar o resultado
 for i, conc_dia in enumerate(filtered_dfs_conc):
     print(f"Dia {i+1}:")
     print(conc_dia.head())  # Exibe as primeiras linhas do DataFrame de concentração para cada dia
-    
-    
-import numpy as np
-import pandas as pd
+
+
 
 # Constantes (substitua com seus valores!)
 lambda_v = 68e-9   # Caminho livre médio do vapor [m]
@@ -3342,49 +3315,49 @@ T = 298  # Temperatura (K)
 eta = 1.81e-5  # Viscosidade do ar (Pa.s)
 
 # Função para calcular o coeficiente de difusão
-def diffusion_coefficient(d_p):
+def diffusion_coefficient_p3_1(d_p):
     # Convertendo o diâmetro de nm para metros
     d_p_m = d_p * 1e-9  # Conversão de nm para metros
     C = (1 + lambda_v / d_p_m)
     return (k * T * C) / (3 * np.pi * eta * d_p_m)
 
 # Função para calcular CS para um DataFrame
-def calculate_cs(df):
+def calculate_cs_p3_1(df):
     # Extrair diâmetros das colunas e converter para raio
     diameters = df.columns.astype(float)  # Os diâmetros estão em nm
     radii = diameters / 2  # Converte diâmetro para raio (ajuste se já for raio)
-    
+
     # Calcular D para cada diâmetro individualmente
-    D = np.array([diffusion_coefficient(d) for d in diameters])  # Calculando D para cada diâmetro
-    
+    D = np.array([diffusion_coefficient_p3_1(d) for d in diameters])  # Calculando D para cada diâmetro
+
     # Calcular Kn e beta_M para cada tamanho de partícula
     radii_m = radii * 1e-9  # Conversão de nm para metros (raio)
     kn = lambda_v / radii_m
     beta_M = (kn + 1) / (((0.377 * kn) + 1) + ((4/3)*alpha**-1) * kn**2 + ((4/3)*alpha**-1) * kn)
-    
+
     # Verificar se o comprimento de 'beta_M' é igual ao de 'radii'
     if len(beta_M) != len(radii):
         raise ValueError(f"Dimensões incompatíveis: beta_M tem {len(beta_M)} elementos, enquanto radii tem {len(radii)} elementos.")
-    
+
     # Calcular CS' para cada linha (datetime) e garantir as dimensões corretas
     cs_values = []
     for row in df.itertuples(index=False):
         # Multiplicação elemento por elemento para cada linha
         cs_prime = np.sum(beta_M * radii * np.array(row))
-        
+
         # Calcular CS = 4 * pi * D * CS'
         cs = 4 * np.pi * D * cs_prime  # Aqui, a multiplicação é feita corretamente
-        
+
         # Aqui a unidade já está em partículas/cm³*s, pois np.array(row) já está em partículas/cm³
         # Multiplicamos por 10^-2 para o ajuste solicitado
-        cs = cs 
+        cs = cs
         cs_values.append(cs)
 
     # Retornar o valor médio do CS para aquele dia
     return np.mean(cs_values, axis=0)
 
 # Calcular CS para cada DataFrame em filtered_dfs
-cs_por_dia = [calculate_cs(df) for df in filtered_dfs_conc]
+cs_por_dia = [calculate_cs_p3_1(df) for df in filtered_dfs_conc]
 
 # Criar uma lista de DataFrames com os valores médios do CS
 cs_dfs = [pd.DataFrame(cs, columns=['CS']) for cs in cs_por_dia]
@@ -3394,28 +3367,26 @@ for i, cs_df in enumerate(cs_dfs):
     cs_mean = cs_df['CS'].sum()  # Média do CS para aquele dia
     # Exibindo o valor em notação científica
     print(f"Dia {i+1}: Média de CS = {cs_mean:.2e} partículas/cm³*s")
-    
+
 
 
 # Filtrar as colunas com diâmetros entre 9 e 25
-def filter_columns_by_diameter(df, min_diameter=9, max_diameter=600):
+def filter_columns_by_diameter_p3_1(df, min_diameter=9, max_diameter=600):
     # Converter os nomes das colunas para float, se necessário
     df.columns = df.columns.astype(float)
-    
+
     # Filtrar as colunas com diâmetros entre min_diameter e max_diameter
     df_filtered = df.loc[:, (df.columns >= min_diameter) & (df.columns <= max_diameter)]
-    
+
     return df_filtered
 
 # Aplicar o filtro para cada DataFrame em filtered_dfs_conc
-filtered_dfs_conc_filtered = [filter_columns_by_diameter(df) for df in filtered_dfs_conc]
+filtered_dfs_conc_filtered = [filter_columns_by_diameter_p3_1(df) for df in filtered_dfs_conc]
 
 # Verificar os resultados
 for i, df in enumerate(filtered_dfs_conc_filtered):
     print(f"DataFrame {i+1} filtrado:\n", df.head())
 
-import numpy as np
-import pandas as pd
 
 # Constantes físicas (ajuste conforme seus dados!)
 k = 1.38e-23          # Constante de Boltzmann [J/K]
@@ -3426,58 +3397,58 @@ lambda_ar = 66e-9     # Caminho livre médio no ar [m]
 a1, a2, a3 = 1.142, 0.558, 0.999  # Parâmetros de Cunningham
 
 # Funções auxiliares
-def cunningham_correction(Kn):
+def cunningham_correction_p3_1(Kn):
     return 1 + Kn * (a1 + a2 * np.exp(-a3 / Kn))
 
-def particle_diffusion(R, Cc):
+def particle_diffusion_p3_1(R, Cc):
     return (k * T * Cc) / (6 * np.pi * mu * R)
 
-def particle_mass(R):
+def particle_mass_p3_1(R):
     return (4/3) * np.pi * (R**3) * densidade
 
-def thermal_velocity(m):
+def thermal_velocity_p3_1(m):
     return np.sqrt(8 * k * T / (np.pi * m))
 
-def calculate_coags(df):
+def calculate_coags_p3_1(df):
     # Extrair diâmetros e converter para raio (ajuste unidades se necessário)
     diameters = df.columns.astype(float)
     radii = diameters / 2  # Diâmetro → raio
-    
+
     # Calcular Kn, Cc, D_i, m_i, c_bar_i para cada raio
     Kn = lambda_ar / radii
-    Cc = cunningham_correction(Kn)
-    D = particle_diffusion(radii, Cc)
-    mass = particle_mass(radii)
-    c_bar = thermal_velocity(mass)
-    
+    Cc = cunningham_correction_p3_1(Kn)
+    D = particle_diffusion_p3_1(radii, Cc)
+    mass = particle_mass_p3_1(radii)
+    c_bar = thermal_velocity_p3_1(mass)
+
     # Matriz de coeficientes K_ij para todas as combinações (i, j)
     n = len(radii)
     K_matrix = np.zeros((n, n))
-    
+
     for i in range(n):
         for j in range(n):
             R1, R2 = radii[i], radii[j]
             D1, D2 = D[i], D[j]
             m1, m2 = mass[i], mass[j]
-            
+
             # Calcular termos intermediários
             R12 = R1 + R2
             D12 = D1 + D2
             c_bar_12 = np.sqrt(c_bar[i]**2 + c_bar[j]**2)
             Kc_cont = 4 * np.pi * R12 * D12  # Termo do regime contínuo
-            
+
             # Coeficiente de coagulação K_ij
             denominator = R12 + (4 * D12) / (c_bar_12 * R12)
             K_ij = Kc_cont / denominator
             K_matrix[i, j] = K_ij
-    
+
     # Calcular CoagS para cada linha (datetime) de forma escalar
     coagS = df.apply(lambda row: np.sum(np.array(K_matrix) * row.values), axis=1)
-    
+
     return coagS
 
 # Calcular CoagS para cada DataFrame em filtered_dfs
-coag_sinks_por_dia = [calculate_coags(df) for df in filtered_dfs_conc]
+coag_sinks_por_dia = [calculate_coags_p3_1(df) for df in filtered_dfs_conc]
 
 # Criar uma lista de DataFrames com os valores de CoagS
 coag_sinks_dfs = [pd.DataFrame(coag, columns=['CoagS']) for coag in coag_sinks_por_dia]
@@ -3491,10 +3462,10 @@ for i, coag_df in enumerate(coag_sinks_dfs):
 
 
 
-#######################################################################################
-#######################################################################################
 
-import numpy as np
+# --- ALTERNATIVE VARIATION 3 (Kulmala) ---
+
+
 
 # Constantes físicas
 kB = 1.38e-23        # J/K
@@ -3503,19 +3474,19 @@ mu = 1.81e-5         # Pa s
 lambda_air = 66e-9   # m
 alpha = 1.0          # sticking coefficient
 
-def cunningham(dp):
+def cunningham_p5_1(dp):
     Kn = lambda_air / dp
     return 1 + Kn * (1.257 + 0.4 * np.exp(-1.1 / Kn))
 
-def diffusion_vapor():
+def diffusion_vapor_p5_1():
     # Difusão típica do H2SO4 no ar (Kulmala 2004)
     return 0.06e-4  # m²/s
 
-def beta_fuchs(dp):
+def beta_fuchs_p5_1(dp):
     Kn = lambda_air / dp
     return (1 + Kn) / (1 + 1.71*Kn + 1.33*Kn**2)
 
-def calculate_CS(df):
+def calculate_CS_p5_1(df):
     """
     df: DataFrame diário
         colunas = dp (nm)
@@ -3525,8 +3496,8 @@ def calculate_CS(df):
     dp_nm = df.columns.astype(float).values
     dp_m = dp_nm * 1e-9
 
-    Dv = diffusion_vapor()
-    beta = beta_fuchs(dp_m)
+    Dv = diffusion_vapor_p5_1()
+    beta = beta_fuchs_p5_1(dp_m)
 
     CS_list = []
 
@@ -3536,21 +3507,21 @@ def calculate_CS(df):
         CS_list.append(CS)
 
     return pd.Series(CS_list, index=df.index)
-cs_por_dia = [calculate_CS(df).mean() for df in filtered_dfs]
+cs_por_dia = [calculate_CS_p5_1(df).mean() for df in filtered_dfs]
 
 for i, cs in enumerate(cs_por_dia):
     print(f"Dia {i+1}: CS = {cs:.2e} s⁻¹")
-    
-def diffusion_particle(dp):
-    Cc = cunningham(dp)
+
+def diffusion_particle_p5_1(dp):
+    Cc = cunningham_p5_1(dp)
     return (kB * T * Cc) / (3 * np.pi * mu * dp)
 
-def coag_kernel(dp_i, dp_j):
-    Di = diffusion_particle(dp_i)
-    Dj = diffusion_particle(dp_j)
+def coag_kernel_p5_1(dp_i, dp_j):
+    Di = diffusion_particle_p5_1(dp_i)
+    Dj = diffusion_particle_p5_1(dp_j)
     return 4 * np.pi * (Di + Dj) * (dp_i + dp_j)
 
-def calculate_CoagS(df, dp_target_nm=10):
+def calculate_CoagS_p5_1(df, dp_target_nm=10):
     """
     Coagulation sink para partículas de dp_target_nm
     retorna: Series CoagS(t) em s⁻¹
@@ -3563,18 +3534,18 @@ def calculate_CoagS(df, dp_target_nm=10):
 
     for _, row in df.iterrows():
         Nj = row.values * 1e6  # cm⁻³ → m⁻³
-        Kij = coag_kernel(dp_i, dp_bins_m)
+        Kij = coag_kernel_p5_1(dp_i, dp_bins_m)
         CoagS = np.sum(Kij * Nj)
         CoagS_list.append(CoagS)
 
     return pd.Series(CoagS_list, index=df.index)
 
-coags_por_dia = [calculate_CoagS(df, dp_target_nm=25).mean()
+coags_por_dia = [calculate_CoagS_p5_1(df, dp_target_nm=25).mean()
                  for df in filtered_dfs]
 
 for i, cs in enumerate(coags_por_dia):
     print(f"Dia {i+1}: CoagS(10 nm) = {cs:.2e} s⁻¹")
-    
+
 gr_scav_por_dia = [
     calculate_gr_scav(df, coagS.sum(axis=1))
     for df, coagS in zip(filtered_dfs, coagS_por_dia)
@@ -3585,7 +3556,7 @@ GR_dp = np.std(gr_scav_por_dia, ddof=1)
 
 print(f"GR = {GR_medio:.2f} ± {GR_dp:.2f} nm/h")
 
-cs_por_dia = [calculate_CS(df).mean() for df in filtered_dfs]
+cs_por_dia = [calculate_CS_p5_1(df).mean() for df in filtered_dfs]
 
 CS_medio = np.mean(cs_por_dia)
 CS_dp = np.std(cs_por_dia, ddof=1)
